@@ -1,0 +1,158 @@
+{% doc %}
+  @prompt
+    Add a custom badge image overlay to product cards that reads from a product metafield (namespace: custom, key: badge_image). The badge should appear in the top-left or top-right corner of the product card image, similar to how sale/new badges are positioned. The image should be sized appropriately as a small badge (e.g., 60-80px), and should only display if the metafield has a value. It should work within the existing product card/grid structure of the theme.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-custom-badge-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    display: block;
+  }
+
+  .ai-custom-badge-overlay-{{ ai_gen_id }}--top-left {
+    top: {{ block.settings.badge_offset_vertical }}px;
+    left: {{ block.settings.badge_offset_horizontal }}px;
+  }
+
+  .ai-custom-badge-overlay-{{ ai_gen_id }}--top-right {
+    top: {{ block.settings.badge_offset_vertical }}px;
+    right: {{ block.settings.badge_offset_horizontal }}px;
+  }
+
+  .ai-custom-badge-overlay-{{ ai_gen_id }}--bottom-left {
+    bottom: {{ block.settings.badge_offset_vertical }}px;
+    left: {{ block.settings.badge_offset_horizontal }}px;
+  }
+
+  .ai-custom-badge-overlay-{{ ai_gen_id }}--bottom-right {
+    bottom: {{ block.settings.badge_offset_vertical }}px;
+    right: {{ block.settings.badge_offset_horizontal }}px;
+  }
+
+  .ai-custom-badge-overlay-{{ ai_gen_id }} img {
+    width: {{ block.settings.badge_size }}px;
+    height: auto;
+    display: block;
+    border-radius: {{ block.settings.badge_border_radius }}px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-custom-badge-overlay-{{ ai_gen_id }} img {
+      width: {{ block.settings.badge_size_mobile }}px;
+    }
+  }
+{% endstyle %}
+
+{% if product.metafields.custom.badge_image %}
+  <div
+    class="ai-custom-badge-overlay-{{ ai_gen_id }} ai-custom-badge-overlay-{{ ai_gen_id }}--{{ block.settings.badge_position | replace: ' ', '-' }}"
+    {{ block.shopify_attributes }}
+  >
+    <img
+      src="{{ product.metafields.custom.badge_image | image_url: width: 200 }}"
+      alt="{{ product.metafields.custom.badge_image.alt | default: 'Product badge' | escape }}"
+      loading="lazy"
+      width="{{ block.settings.badge_size }}"
+      height="{{ block.settings.badge_size }}"
+    >
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Custom badge overlay",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge settings"
+    },
+    {
+      "type": "paragraph",
+      "content": "This block displays a custom badge image from the product metafield (namespace: custom, key: badge_image). The badge only appears when the metafield has a value."
+    },
+    {
+      "type": "select",
+      "id": "badge_position",
+      "label": "Position",
+      "options": [
+        {
+          "value": "top left",
+          "label": "Top left"
+        },
+        {
+          "value": "top right",
+          "label": "Top right"
+        },
+        {
+          "value": "bottom left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "top left"
+    },
+    {
+      "type": "range",
+      "id": "badge_size",
+      "label": "Badge size",
+      "min": 30,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "badge_size_mobile",
+      "label": "Badge size on mobile",
+      "min": 30,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "badge_offset_horizontal",
+      "label": "Horizontal offset",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "badge_offset_vertical",
+      "label": "Vertical offset",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom badge overlay"
+    }
+  ],
+  "tag": null
+}
+{% endschema %}
